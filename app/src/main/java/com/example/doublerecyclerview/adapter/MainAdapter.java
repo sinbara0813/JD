@@ -37,7 +37,7 @@ public class MainAdapter extends DelegateAdapter.Adapter {
             TextView textView=new TextView(parent.getContext());
             return new MainAdapter.ViewHolder(textView);
         }else {
-            TabViewPager tabViewPager=new TabViewPager(parent.getContext());
+            TabViewPager tabViewPager=new TabViewPager(parent.getContext(), (RecyclerView) parent);
             return new ViewPagerHolder(tabViewPager);
         }
     }

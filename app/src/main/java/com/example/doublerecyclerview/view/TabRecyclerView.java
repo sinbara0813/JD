@@ -53,8 +53,20 @@ public class TabRecyclerView extends RecyclerView {
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent e) {
+        boolean isDrag=false;
+        switch (e.getAction()){
+            case MotionEvent.ACTION_DOWN:
+                mInitialTouchY = mLastTouchY = (int) (e.getY() + 0.5f);
+                break;
+            case MotionEvent.ACTION_MOVE:
+                final int y = (int) (e.getY() + 0.5f);
+                final int dy = y - mInitialTouchY;
+                if (Math.abs(dy) > 3){ //垂直方向拦截事件
+                    isDrag=true;
+                }
+        }
         TabViewPager viewPager=getViewPager();
-        boolean intercept=viewPager!=null?!viewPager.isTop():false;
+        boolean intercept=viewPager!=null?!viewPager.isTop()&&isDrag:false;
         Log.e(TAG,"onInterceptTouchEvent=="+intercept);
         return super.onInterceptTouchEvent(e)||intercept;
     }
