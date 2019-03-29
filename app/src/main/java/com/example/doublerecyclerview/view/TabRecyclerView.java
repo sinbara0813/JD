@@ -2,6 +2,7 @@ package com.example.doublerecyclerview.view;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -9,6 +10,8 @@ import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
+import android.view.animation.Interpolator;
+import android.widget.OverScroller;
 
 /**
  * 作者:Created by sinbara on 2019/3/27.
@@ -30,6 +33,7 @@ public class TabRecyclerView extends RecyclerView {
     private boolean isDown;
     private float yvel;
     private boolean isEnterFrist;
+    private ViewFlinger mViewFlinger; //处理fling事件工具类
 
     public TabRecyclerView(Context context) {
         this(context, null);
@@ -49,6 +53,7 @@ public class TabRecyclerView extends RecyclerView {
         mTouchSlop = vc.getScaledTouchSlop();
         mMinFlingVelocity = vc.getScaledMinimumFlingVelocity();
         mMaxFlingVelocity = vc.getScaledMaximumFlingVelocity();
+        mViewFlinger=new ViewFlinger(this);
     }
 
     @Override
@@ -120,6 +125,10 @@ public class TabRecyclerView extends RecyclerView {
                     if (isUp||(!viewPager.isExpand()&&isDown)){
                         isEnterFrist=true;
                         viewPager.handleEvent(e);
+                        if (isDown){
+                            mVelocityTracker.addMovement(vtev);
+                            eventAddedToVelocityTracker = true;
+                        }
                         return true;
                     }
                     if (viewPager.isExpand()&&isDown){
@@ -137,6 +146,16 @@ public class TabRecyclerView extends RecyclerView {
                     if (isUp||(!viewPager.isExpand()&&isDown)){
                         isEnterFrist=true;
                         viewPager.handleEvent(e);
+                        if (isDown){
+                            Log.e(TAG,"offer="+viewPager.getOffer());
+                            vtev.offsetLocation(0,viewPager.getOffer());
+                            mVelocityTracker.addMovement(vtev);
+                            eventAddedToVelocityTracker = true;
+                            mVelocityTracker.computeCurrentVelocity(1000, mMaxFlingVelocity);
+                            yvel = -mVelocityTracker.getYVelocity(mScrollPointerId);
+                            Log.e(TAG,"yvel=="+yvel);
+                        }
+                        viewPager.resetEvent();
                         return true;
                     }
                 }
@@ -172,5 +191,57 @@ public class TabRecyclerView extends RecyclerView {
             }
         }
         return null;
+    }
+
+    public void startScroll(){
+        //根据速度继续滑动
+
+        //mViewFlinger.fling(0,(int)yvel);
+    }
+
+    static final Interpolator sQuinticInterpolator = new Interpolator() {
+        @Override
+        public float getInterpolation(float t) {
+            t -= 1.0f;
+            return t * t * t * t * t + 1.0f;
+        }
+    };
+
+    class ViewFlinger implements Runnable{
+
+        private int mLastFlingX;
+        private int mLastFlingY;
+        private OverScroller mScroller;
+        private RecyclerView recyclerView;
+
+        public ViewFlinger(RecyclerView recyclerView){
+            this.recyclerView=recyclerView;
+            mScroller=new OverScroller(recyclerView.getContext(),sQuinticInterpolator);
+        }
+
+        @Override
+        public void run() {
+            final OverScroller scroller = mScroller;
+            if (scroller.computeScrollOffset()){
+                final int x = scroller.getCurrX();
+                final int y = scroller.getCurrY();
+                int dx = x - mLastFlingX;
+                int dy = y - mLastFlingY;
+                recyclerView.scrollBy(dx,dy);
+                postOnAnimation();
+            }
+        }
+
+        void postOnAnimation() {
+            recyclerView.removeCallbacks(this);
+            ViewCompat.postOnAnimation(recyclerView, this);
+        }
+
+        public void fling(int velocityX, int velocityY) {
+            mLastFlingX = mLastFlingY = 0;
+            mScroller.fling(0, 0, velocityX, velocityY,
+                    Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE);
+            postOnAnimation();
+        }
     }
 }

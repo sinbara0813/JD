@@ -14,4 +14,5 @@ public interface ExpandListener {
 
     View getScrollableView();
 
+    int getOffer();
 }

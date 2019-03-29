@@ -18,6 +18,8 @@ import com.alibaba.android.vlayout.layout.GridLayoutHelper;
 import com.example.doublerecyclerview.R;
 import com.example.doublerecyclerview.adapter.SampleAdapter;
 import com.example.doublerecyclerview.listener.ExpandListener;
+import com.example.doublerecyclerview.util.ScreenUtil;
+import com.example.doublerecyclerview.view.TabViewPager;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -37,6 +39,7 @@ public class SubFragment extends Fragment implements ExpandListener {
 
     private boolean isExpand=true;
     private GridLayoutHelper staggerLayoutHelper;
+    private TabViewPager.Listener listener;
 
     @Nullable
     @Override
@@ -64,7 +67,16 @@ public class SubFragment extends Fragment implements ExpandListener {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 isExpand=layoutManager.getOffsetToStart()==-dip2px(16);
-                Log.e("han","offerStart=="+layoutManager.getOffsetToStart());
+                if (isExpand){
+                    if (listener!=null){
+                        listener.isScrollTop(true);
+                    }
+                }else {
+                    if (listener!=null){
+                        listener.isScrollTop(false);
+                    }
+                }
+                //Log.e("han","offerStart=="+layoutManager.getOffsetToStart());
                 super.onScrolled(recyclerView, dx, dy);
             }
         });
@@ -87,6 +99,11 @@ public class SubFragment extends Fragment implements ExpandListener {
         return recyclerView;
     }
 
+    @Override
+    public int getOffer() {
+        return layoutManager.getOffsetToStart()- ScreenUtil.dip2px(16);
+    }
+
     private int dip2px(int dipValue) {
         DisplayMetrics dm = getActivity().getApplicationContext().getResources().getDisplayMetrics();
         float scale = dm.density;
@@ -96,5 +113,10 @@ public class SubFragment extends Fragment implements ExpandListener {
     private int getItemWidth(){
         DisplayMetrics dm = getActivity().getApplicationContext().getResources().getDisplayMetrics();
         return (dm.widthPixels - dip2px(48)) / 2;
+    }
+
+    public SubFragment setListener(TabViewPager.Listener listener){
+        this.listener=listener;
+        return this;
     }
 }

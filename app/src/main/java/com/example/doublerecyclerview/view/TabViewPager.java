@@ -35,7 +35,7 @@ import butterknife.ButterKnife;
  * 邮箱:hrb940258169@163.com
  */
 
-public class TabViewPager extends FrameLayout {
+public class TabViewPager extends FrameLayout{
 
     @Bind(R.id.sliding_tab)
     SlidingTabLayout slidingTab;
@@ -45,11 +45,11 @@ public class TabViewPager extends FrameLayout {
     private Context mContext;
     private TabPagerAdapter tabAdapter;
 
-    private RecyclerView outRecyclerView; //外部recyclerview
+    private TabRecyclerView outRecyclerView; //外部recyclerview
     private View currentScrollView; //内部recyclerview
     private boolean isEnterFirst =true; //事件由外部处理变成内部处理的临界点
 
-    public TabViewPager(@NonNull Context context, RecyclerView outRecyclerView) {
+    public TabViewPager(@NonNull Context context, TabRecyclerView outRecyclerView) {
         super(context);
         this.outRecyclerView=outRecyclerView;
         init(context);
@@ -72,7 +72,14 @@ public class TabViewPager extends FrameLayout {
         final List<Fragment> fragments = new ArrayList<>();
         List<String> cateList=new ArrayList<>();
         for (int i = 0; i < size; i++) {
-            fragments.add(new SubFragment());
+            fragments.add(new SubFragment().setListener(new Listener() {
+                @Override
+                public void isScrollTop(boolean is) {
+                    if (is){
+                        outRecyclerView.startScroll();
+                    }
+                }
+            }));
             switch (i){
                 case 0:
                     cateList.add("精选推荐");
@@ -178,6 +185,18 @@ public class TabViewPager extends FrameLayout {
         return is;
     }
 
+    public int getOffer(){
+        TabPagerAdapter mainPageAdapter= (TabPagerAdapter) viewPager.getAdapter();
+        Fragment fragment= null;
+        if (mainPageAdapter!=null){
+            fragment=mainPageAdapter.getItem(viewPager.getCurrentItem());
+        }
+        if (fragment!=null&&fragment instanceof ExpandListener){
+            return ((ExpandListener)fragment).getOffer();
+        }
+        return 0;
+    }
+
     private View getScrollView(){
         if (currentScrollView==null){
             return ((ExpandListener)tabAdapter.getItem(viewPager.getCurrentItem())).getScrollableView();
@@ -211,5 +230,9 @@ public class TabViewPager extends FrameLayout {
             E.printStackTrace();
         }
         return sbar;
+    }
+
+    public interface Listener{
+        public void isScrollTop(boolean is);
     }
 }

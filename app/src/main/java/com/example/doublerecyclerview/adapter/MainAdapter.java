@@ -10,6 +10,7 @@ import android.widget.TextView;
 import com.alibaba.android.vlayout.DelegateAdapter;
 import com.alibaba.android.vlayout.LayoutHelper;
 import com.alibaba.android.vlayout.layout.LinearLayoutHelper;
+import com.example.doublerecyclerview.view.TabRecyclerView;
 import com.example.doublerecyclerview.view.TabViewPager;
 
 /**
@@ -37,7 +38,7 @@ public class MainAdapter extends DelegateAdapter.Adapter {
             TextView textView=new TextView(parent.getContext());
             return new MainAdapter.ViewHolder(textView);
         }else {
-            TabViewPager tabViewPager=new TabViewPager(parent.getContext(), (RecyclerView) parent);
+            TabViewPager tabViewPager=new TabViewPager(parent.getContext(), (TabRecyclerView) parent);
             return new ViewPagerHolder(tabViewPager);
         }
     }
