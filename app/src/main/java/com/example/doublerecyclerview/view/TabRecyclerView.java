@@ -200,7 +200,6 @@ public class TabRecyclerView extends RecyclerView {
     public void startScroll(){
         //根据速度继续滑动
         if (yvel<0){
-            //TODO这个要有个求速度的正确算法
             mViewFlinger.fling(0,(int)yvel);
         }
     }
@@ -249,7 +248,7 @@ public class TabRecyclerView extends RecyclerView {
 
         public void fling(int velocityX, int velocityY) {
             mLastFlingX = mLastFlingY = 0;
-            mScroller.fling(0, 0, velocityX, velocityY,
+            mScroller.fling(0, offer, velocityX, velocityY,
                     Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE);
             postOnAnimation();
         }
