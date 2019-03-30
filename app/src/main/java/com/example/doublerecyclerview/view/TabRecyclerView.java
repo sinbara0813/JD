@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.animation.Interpolator;
 import android.widget.OverScroller;
+import android.widget.ScrollView;
 
 /**
  * 作者:Created by sinbara on 2019/3/27.
@@ -34,6 +35,7 @@ public class TabRecyclerView extends RecyclerView {
     private float yvel;
     private boolean isEnterFrist;
     private ViewFlinger mViewFlinger; //处理fling事件工具类
+    private int offer;
 
     public TabRecyclerView(Context context) {
         this(context, null);
@@ -147,8 +149,7 @@ public class TabRecyclerView extends RecyclerView {
                         isEnterFrist=true;
                         viewPager.handleEvent(e);
                         if (isDown){
-                            Log.e(TAG,"offer="+viewPager.getOffer());
-                            vtev.offsetLocation(0,viewPager.getOffer());
+                            offer=viewPager.getOffer();
                             mVelocityTracker.addMovement(vtev);
                             eventAddedToVelocityTracker = true;
                             mVelocityTracker.computeCurrentVelocity(1000, mMaxFlingVelocity);
@@ -156,6 +157,9 @@ public class TabRecyclerView extends RecyclerView {
                             Log.e(TAG,"yvel=="+yvel);
                         }
                         viewPager.resetEvent();
+                        if (mVelocityTracker != null) {
+                            mVelocityTracker.clear();
+                        }
                         return true;
                     }
                 }
@@ -195,8 +199,10 @@ public class TabRecyclerView extends RecyclerView {
 
     public void startScroll(){
         //根据速度继续滑动
-
-        //mViewFlinger.fling(0,(int)yvel);
+        if (yvel<0){
+            //TODO这个要有个求速度的正确算法
+            mViewFlinger.fling(0,(int)yvel);
+        }
     }
 
     static final Interpolator sQuinticInterpolator = new Interpolator() {
@@ -227,6 +233,10 @@ public class TabRecyclerView extends RecyclerView {
                 final int y = scroller.getCurrY();
                 int dx = x - mLastFlingX;
                 int dy = y - mLastFlingY;
+                mLastFlingX = x;
+                mLastFlingY = y;
+                /*if (Math.abs(y)-offer>0){
+                }*/
                 recyclerView.scrollBy(dx,dy);
                 postOnAnimation();
             }
