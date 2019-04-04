@@ -72,8 +72,7 @@ public class TabRecyclerView extends RecyclerView {
                     isDrag=true;
                 }
         }
-        TabViewPager viewPager=getViewPager();
-        boolean intercept=viewPager!=null?!viewPager.isTop()&&isDrag:false;
+        boolean intercept=isDrag;
         Log.e(TAG,"onInterceptTouchEvent=="+intercept);
         return super.onInterceptTouchEvent(e)||intercept;
     }
@@ -90,9 +89,6 @@ public class TabRecyclerView extends RecyclerView {
         final MotionEvent vtev = MotionEvent.obtain(e);
         final int action = e.getActionMasked();
 
-        if (action == MotionEvent.ACTION_DOWN) {
-            mNestedOffsets[0] = mNestedOffsets[1] = 0;
-        }
         if (action == MotionEvent.ACTION_DOWN) {
             mNestedOffsets[0] = mNestedOffsets[1] = 0;
         }
@@ -121,6 +117,7 @@ public class TabRecyclerView extends RecyclerView {
                     isDown = true;
                     isUp=false;
                 }
+                Log.e(TAG,"isDown="+isDown+",isUp="+isUp);
                 mLastTouchY = y;
                 viewPager=getViewPager();
                 if (viewPager!=null&&viewPager.isTop()){
@@ -200,7 +197,9 @@ public class TabRecyclerView extends RecyclerView {
     public void startScroll(){
         //根据速度继续滑动
         if (yvel<0){
-            mViewFlinger.fling(0,(int)yvel);
+            //mViewFlinger.fling(0,(int)yvel);
+            fling(0,(int)yvel);
+            yvel=0;
         }
     }
 
