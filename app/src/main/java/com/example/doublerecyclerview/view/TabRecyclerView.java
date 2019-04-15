@@ -72,9 +72,8 @@ public class TabRecyclerView extends RecyclerView {
                     isDrag=true;
                 }
         }
-        boolean intercept=isDrag;
-        Log.e(TAG,"onInterceptTouchEvent=="+intercept);
-        return super.onInterceptTouchEvent(e)||intercept;
+        Log.e(TAG,"onInterceptTouchEvent=="+isDrag);
+        return super.onInterceptTouchEvent(e)||isDrag;
     }
 
     @Override
@@ -194,7 +193,7 @@ public class TabRecyclerView extends RecyclerView {
         return null;
     }
 
-    public void startScroll(){
+    public void startScroll(int yvel){
         //根据速度继续滑动
         if (yvel<0){
             //mViewFlinger.fling(0,(int)yvel);

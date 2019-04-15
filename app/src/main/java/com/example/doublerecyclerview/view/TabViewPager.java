@@ -74,9 +74,9 @@ public class TabViewPager extends FrameLayout{
         for (int i = 0; i < size; i++) {
             fragments.add(new SubFragment().setListener(new Listener() {
                 @Override
-                public void isScrollTop(boolean is) {
+                public void isScrollTop(boolean is,int yvel) {
                     if (is){
-                        outRecyclerView.startScroll();
+                        outRecyclerView.startScroll(yvel);
                     }
                 }
             }));
@@ -233,6 +233,6 @@ public class TabViewPager extends FrameLayout{
     }
 
     public interface Listener{
-        public void isScrollTop(boolean is);
+        public void isScrollTop(boolean is,int yvel);
     }
 }

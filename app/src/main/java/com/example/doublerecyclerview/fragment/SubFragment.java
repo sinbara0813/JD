@@ -40,6 +40,7 @@ public class SubFragment extends Fragment implements ExpandListener {
     private boolean isExpand=true;
     private GridLayoutHelper staggerLayoutHelper;
     private TabViewPager.Listener listener;
+    private int yvel;
 
     @Nullable
     @Override
@@ -69,15 +70,28 @@ public class SubFragment extends Fragment implements ExpandListener {
                 isExpand=layoutManager.getOffsetToStart()==-dip2px(16);
                 if (isExpand){
                     if (listener!=null){
-                        listener.isScrollTop(true);
+                        listener.isScrollTop(true,yvel);
                     }
                 }else {
                     if (listener!=null){
-                        listener.isScrollTop(false);
+                        listener.isScrollTop(false,yvel);
                     }
                 }
                 //Log.e("han","offerStart=="+layoutManager.getOffsetToStart());
                 super.onScrolled(recyclerView, dx, dy);
+            }
+        });
+        recyclerView.setOnFlingListener(new RecyclerView.OnFlingListener() {
+            @Override
+            public boolean onFling(int velocityX, int velocityY) {
+                yvel=velocityY;
+                if (yvel<0){
+                    Log.e("han","开始速度=="+yvel);
+                    float t= getOffer()*1000/yvel;
+                    yvel=yvel-(int)(12*t/0.9);
+                    Log.e("han","結束速度=="+yvel);
+                }
+                return false;
             }
         });
         return view;
